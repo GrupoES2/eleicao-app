@@ -1,0 +1,31 @@
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Painel do Chefe</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="sair()">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-tabs>
+  <ion-tab-bar slot="bottom" class="ion-justify-content-around">
+    
+    <ion-tab-button tab="gerenciar" routerLink="/tabs-chefe/gerenciar">
+      <ion-icon name="settings-outline"></ion-icon>
+      <ion-label>Gerenciar</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="cadastrar" routerLink="/tabs-chefe/cadastrar">
+      <ion-icon name="person-add-outline"></ion-icon>
+      <ion-label>Cadastrar</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="resultados" routerLink="/tabs-chefe/resultados">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+      <ion-label>Resultados</ion-label>
+    </ion-tab-button>
+
+  </ion-tab-bar>
+</ion-tabs>

@@ -25,7 +25,7 @@
     </div>
 
     
-    <ion-button expand="block" class="ion-margin-top" (click)="entrar()" [disabled]="carregando">
+    <ion-button expand="block" class="ion-margin-top" (click)="entrar(); clean()" [disabled]="carregando">
       {{ carregando ? 'Entrando...' : 'Entrar' }}
     </ion-button>
   </div>

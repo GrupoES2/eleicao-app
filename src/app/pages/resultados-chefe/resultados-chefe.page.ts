@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
 
 @Component({
-  selector: 'app-home-chefe',
-  templateUrl: './home-chefe.page.html',
-  styleUrls: ['./home-chefe.page.scss'],
+  selector: 'app-resultados-chefe',
+  templateUrl: './resultados-chefe.page.html',
+  styleUrls: ['./resultados-chefe.page.scss'],
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule],
 })
-export class HomeChefePage implements OnInit {
+export class ResultadosChefePage implements OnInit {
   constructor() {}
 
   ngOnInit() {}

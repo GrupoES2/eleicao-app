@@ -19,12 +19,25 @@ export class AuthService {
   }
 
   login(login: string, senha: string): Observable<Usuario> {
-    return this.http.get<Usuario[]>(`${this.apiUrl}/usuarios?login=${login}&senha=${senha}`).pipe(
+       console.log('--- TENTANDO LOGIN ---');
+    console.log('URL da API:', this.apiUrl);
+    
+    return this.http.get<Usuario[]>(`${this.apiUrl}/usuarios`).pipe(
       map(lista => {
-        if (!lista || lista.length === 0) {
+        console.log('Dados recebidos do banco:', lista); // Vai mostrar a lista inteira
+        
+        if (!lista || !Array.isArray(lista)) {
+          throw new Error('Erro ao ler dados da API');
+        }
+
+        const user = lista.find(u => u.login === login && u.senha === senha);
+        
+        if (!user) {
+          console.log('Usuário não encontrado com essas credenciais.');
           throw new Error('Login ou senha inválidos');
         }
-        const user = lista[0];
+        
+        console.log('Usuário encontrado:', user);
         localStorage.setItem('usuario', JSON.stringify(user));
         this.usuarioAtual.next(user);
         return user;

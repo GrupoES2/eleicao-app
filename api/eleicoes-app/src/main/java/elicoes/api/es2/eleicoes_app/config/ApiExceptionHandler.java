@@ -3,6 +3,7 @@ package elicoes.api.es2.eleicoes_app.config;
 import elicoes.api.es2.eleicoes_app.dto.CampoErro;
 import elicoes.api.es2.eleicoes_app.dto.ErroResponse;
 import elicoes.api.es2.eleicoes_app.exception.ConflitoDeDadosException;
+import elicoes.api.es2.eleicoes_app.exception.CredenciaisInvalidasException;
 import elicoes.api.es2.eleicoes_app.exception.RecursoNaoEncontradoException;
 import elicoes.api.es2.eleicoes_app.exception.RequisicaoInvalidaException;
 
@@ -79,6 +80,11 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErroResponse> integridade(DataIntegrityViolationException ex) {
         log.warn("Conflito de integridade ao persistir");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErroResponse("Dados já cadastrados"));
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ErroResponse> credenciais() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErroResponse("Credenciais inválidas"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

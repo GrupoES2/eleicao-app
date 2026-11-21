@@ -3,10 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonItem, 
-  IonLabel, IonInput, IonButton 
+  IonLabel, IonInput, IonButton , IonIcon
 } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { addIcons } from 'ionicons';
+import {  eyeOutline, eyeOffOutline, peopleOutline } from 'ionicons/icons';
+
+
+
 
 @Component({
   selector: 'app-login',
@@ -16,7 +21,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule, FormsModule, 
     IonHeader, IonToolbar, IonTitle, IonContent, IonItem, 
-    IonLabel, IonInput, IonButton
+    IonLabel, IonInput, IonButton,IonIcon
   ]
 })
 export class LoginPage {
@@ -24,11 +29,14 @@ export class LoginPage {
   senha = '';
   erro = '';
   carregando = false;
+ mostrarSenha = false;
 
   constructor(
     private authService: AuthService, 
     private router: Router
-  ) {}
+  ) {  
+    addIcons({  eyeOutline, eyeOffOutline, peopleOutline });
+    }
 
   entrar(){
   this.erro = '';
@@ -39,14 +47,16 @@ export class LoginPage {
   this.carregando = true;
 
   this.authService.login(this.login, this.senha).subscribe({
-    next: (usuario: any) => {
-      this.carregando = false;
+   next: (usuario: any) => {
+        this.carregando = false;
         if (usuario.perfil === 'CHEFE') {
-          this.router.navigateByUrl('/tabs-chefe'); 
+          this.router.navigateByUrl('/tabs-chefe');
         } else if (usuario.perfil === 'ELEITOR') {
-          this.router.navigateByUrl('/home-eleitor');
+          this.router.navigateByUrl('/tabs-eleitor');
+        } else if (usuario.perfil === 'CANDIDATO') { 
+          this.router.navigateByUrl('/tabs-candidato');
         } else {
-          this.router.navigateByUrl('/home-candidato');
+          alert('Perfil não reconhecido');
         }
     },
     error: (err: any) => {
@@ -60,4 +70,10 @@ clean(){
   this.login = '';
   this.senha = '';
 }
-}
+integrantes(){
+  this.router.navigateByUrl('/integrantes');  
+} 
+toggleSenha() {
+    this.mostrarSenha = !this.mostrarSenha;
+  }
+} 

@@ -1,7 +1,12 @@
 
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar color="dark">
     <ion-title>Painel do Chefe</ion-title>
+      <ion-buttons slot="end">
+      <ion-button (click)="abrirMenuPerfil($event)">
+        <ion-icon name="person-circle-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="sair()">
         <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>

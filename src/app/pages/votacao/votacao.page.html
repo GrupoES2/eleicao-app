@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar color="White">
+    <ion-title>Votação</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div *ngIf="carregando" style="text-align: center; margin-top: 50px;">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <div *ngIf="mensagem" style="background: var(--ion-color-success); color: white; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 20px;">
+    {{ mensagem }}
+  </div>
+
+  <div *ngIf="!carregando && eleicoesAbertas.length === 0">
+    <h2 style="text-align: center;">Nenhuma votação aberta no momento.</h2>
+  </div>
+
+  <ion-card *ngFor="let eleicao of eleicoesAbertas">
+   <ion-card-header [style.background]="jaVotouNoCargo(eleicao.cargo) ? '#0E0E6A' : '#93C5FD'" style="border-radius: 10px 10px 0 0;">
+      <ion-card-title >
+        {{ eleicao.cargo }} 
+        <span *ngIf="jaVotouNoCargo(eleicao.cargo)" style="font-size: 0.8em; font-weight: normal;">(Voto Confirmado)</span>
+      </ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let cand of candidatosDoCargo(eleicao.cargo)">
+          <ion-label>
+            <h2>{{ cand.nome }}</h2>
+            <p>Número: {{ cand.numero }}</p>
+          </ion-label>
+          
+          <!-- Se já votou, mostra o botão cinza. Se não, mostra o botão verde -->
+          <ion-button 
+            [color]="jaVotouNoCargo(eleicao.cargo) ? 'medium' : 'success'" 
+            [disabled]="jaVotouNoCargo(eleicao.cargo)"
+            (click)="votar(eleicao, cand)">
+            {{ jaVotouNoCargo(eleicao.cargo) ? 'Votado' : 'Votar' }}
+          </ion-button>
+          
+        </ion-item>
+      </ion-list>
+      <p *ngIf="candidatosDoCargo(eleicao.cargo).length === 0" style="text-align: center;">Nenhum candidato cadastrado.</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

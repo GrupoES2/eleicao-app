@@ -1,6 +1,8 @@
 export interface Candidato {
-  id: number;
+  id?: string | number;
   nome: string;
   numero: number;
+  cargo: string;
+  partido: string; 
   votos: number;
 }

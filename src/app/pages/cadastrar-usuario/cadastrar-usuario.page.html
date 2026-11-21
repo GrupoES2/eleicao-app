@@ -1,17 +1,133 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>cadastrar-usuario</ion-title>
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Cadastrar</ion-title>
   </ion-toolbar>
 </ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">cadastrar-usuario</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
-
 <ion-content class="ion-padding">
-  <h1>Aqui vai ser a tela: [NOME DA TELA]</h1>
+
+  <!-- Abinhas para escolher o que cadastrar -->
+  <ion-segment [(ngModel)]="tipoCadastro" class="ion-margin-bottom" >
+    <ion-segment-button value="ELEITOR">
+      <ion-label>Eleitor</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="CANDIDATO">
+      <ion-label>Candidato</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Caixa do Formulário -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        {{ tipoCadastro === 'ELEITOR' ? 'Novo Eleitor' : 'Novo Candidato' }}
+      </ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <ion-list lines="full">
+        
+        <ion-item>
+          <ion-label position="floating">Nome Completo</ion-label>
+          <ion-input [(ngModel)]="nome"></ion-input>
+        </ion-item>
+
+        <!-- Campos do ELEITOR -->
+        <ng-container *ngIf="tipoCadastro === 'ELEITOR'">
+          <ion-item>
+            <ion-label position="floating">Login (para acessar)</ion-label>
+            <ion-input [(ngModel)]="login"></ion-input>
+          </ion-item>
+           <ion-item>
+        <ion-label position="floating">Senha</ion-label>
+        <ion-input [type]="mostrarSenha ? 'text' : 'password'" [(ngModel)]="senha"></ion-input>
+  
+        <!-- Botão do Olho -->
+       <ion-button fill="clear" slot="end" (click)="toggleSenha()">
+       <ion-icon [name]="mostrarSenha ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+       </ion-button>
+      </ion-item>
+        </ng-container>
+
+        <!-- Campos do CANDIDATO -->
+        <ng-container *ngIf="tipoCadastro === 'CANDIDATO'">
+          <ion-item>
+            <ion-label position="floating">Número do Candidato</ion-label>
+            <ion-input type="number" [(ngModel)]="numero"></ion-input>
+          </ion-item>
+
+           <ion-item>
+           <ion-label position="floating">Partido</ion-label>
+          <ion-input [(ngModel)]="partido" placeholder=" "></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Cargo</ion-label>
+            <ion-select [(ngModel)]="cargo" placeholder="Selecione o cargo">
+              <ion-select-option *ngFor="let el of eleicoes" [value]="el.cargo">
+                {{ el.cargo }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+            <ion-item>
+            <ion-label position="floating">Login (para acessar)</ion-label>
+            <ion-input [(ngModel)]="login"></ion-input>
+          </ion-item>
+          <ion-item>
+        <ion-label position="floating">Senha</ion-label>
+        <ion-input [type]="mostrarSenha ? 'text' : 'password'" [(ngModel)]="senha"></ion-input>
+  
+        <!-- Botão do Olho -->
+       <ion-button fill="clear" slot="end" (click)="toggleSenha()">
+       <ion-icon [name]="mostrarSenha ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+       </ion-button>
+      </ion-item>
+        </ng-container>
+
+      </ion-list>
+
+      <!-- Mensagens de Sucesso ou Erro -->
+      <ion-text color="success" *ngIf="mensagem">
+        <p style="text-align: center;">{{ mensagem }}</p>
+      </ion-text>
+      <ion-text color="danger" *ngIf="erro">
+        <p style="text-align: center;">{{ erro }}</p>
+      </ion-text>
+     <!-- Botão Cadastrar  e salvar-->
+   <ion-button expand="block" class="ion-margin-top" (click)="salvar()">
+        {{ idEditando ? 'Salvar Alterações' : 'Cadastrar' }}
+      </ion-button>
+
+      <!-- só aparece se estiver editando  Cancelar-->
+      <ion-button *ngIf="idEditando" expand="block" color="medium" fill="outline" class="ion-margin-top" (click)="limparFormulario()">
+        Cancelar Edição
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+
+    <!-- LISTA DE USUÁRIOS CADASTRADOS -->
+  <ion-card class="ion-margin-top">
+    <ion-card-header>
+      <ion-card-title>Gerenciar Cadastros</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let user of usuariosCadastrados">
+          <ion-label>
+            <h2>{{ user.nome }}</h2>
+            <p>{{ user.perfil }} | Login: {{ user.login }}</p>
+          </ion-label>
+           <!-- Botao de Editar -->
+          <ion-button *ngIf="user.perfil !== 'CHEFE'" color="primary" fill="clear" (click)="editarUsuario(user)">
+           <ion-icon name="pencil-outline"></ion-icon>
+            </ion-button>
+
+           <!-- Butao de Lixo-->
+          <ion-button color="danger" fill="clear" (click)="excluirUsuario(user)">
+            <ion-icon name="trash-bin-outline"></ion-icon>
+          </ion-button>
+
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

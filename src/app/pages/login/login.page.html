@@ -1,30 +1,39 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Página de Login</ion-title>
+  <ion-toolbar color="dark">
+    
+    <ion-button slot="start">
+      <ion-button (click)="integrantes()">
+        <ion-icon name="people-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-button>
+
+    <ion-title>Eleição-App</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <div style="max-width: 400px; margin: 40px auto;">
-    
+
     <ion-item>
       <ion-label position="floating">Login</ion-label>
-      <!-- login  -->
       <ion-input [(ngModel)]="login" placeholder="Digite seu login"></ion-input>
     </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Senha</ion-label>
-      <!-- senha  -->
-      <ion-input type="password" [(ngModel)]="senha" placeholder="Digite sua senha"></ion-input>
-    </ion-item>
+   <ion-item>
+  <ion-label position="floating">Senha</ion-label>
+  <!-- O type muda dinamicamente: se mostrarSenha for true, vira text, se não, vira password -->
+  <ion-input [type]="mostrarSenha ? 'text' : 'password'" [(ngModel)]="senha" placeholder="Digite sua senha"></ion-input>
+  
+  <!-- O botão do olhinho -->
+  <ion-button fill="clear" slot="end" (click)="toggleSenha()">
+    <ion-icon [name]="mostrarSenha ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+  </ion-button>
+   </ion-item>
 
-    
     <div *ngIf="erro" style="color: red; margin-top: 10px; font-size: 14px; text-align: center;">
       {{ erro }}
     </div>
 
-    
     <ion-button expand="block" class="ion-margin-top" (click)="entrar(); clean()" [disabled]="carregando">
       {{ carregando ? 'Entrando...' : 'Entrar' }}
     </ion-button>

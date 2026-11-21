@@ -1,7 +1,279 @@
 {
   "usuarios": [
-    { "id": 1, "nome": "Chefe", "login": "chefe", "senha": "123", "perfil": "CHEFE" },
-    { "id": 2, "nome": "Eleitor", "login": "eleitor", "senha": "123", "perfil": "ELEITOR" },
-    { "id": 3, "nome": "Candidato", "login": "cand", "senha": "123", "perfil": "CANDIDATO" }
-  ]
+    {
+      "id": "1",
+      "nome": "Chefe",
+      "login": "chefe",
+      "senha": "123",
+      "perfil": "CHEFE"
+    },
+    {
+      "id": "2",
+      "nome": "Eleitor Teste",
+      "login": "eleitor",
+      "senha": "123",
+      "perfil": "ELEITOR"
+    },
+    {
+      "id": "3",
+      "nome": "Candidato Teste",
+      "login": "cand",
+      "senha": "1234",
+      "perfil": "CANDIDATO"
+    },
+    {
+      "nome": "A",
+      "login": "12",
+      "senha": "12",
+      "perfil": "CANDIDATO",
+      "id": "sut0zoSbLME"
+    },
+    {
+      "nome": "Candidato A",
+      "login": "10",
+      "senha": "10",
+      "perfil": "CANDIDATO",
+      "id": "adaadasef"
+    },
+    {
+      "nome": "Candidato B",
+      "login": "13",
+      "senha": "13",
+      "perfil": "CANDIDATO",
+      "id": "sut0fefadzoSbLME"
+    },
+    {
+      "nome": "",
+      "login": "",
+      "senha": "",
+      "perfil": "CANDIDATO",
+      "id": "PzDIKW2GeG0"
+    },
+    {
+      "nome": "AA",
+      "login": "1234",
+      "senha": "1234",
+      "perfil": "CANDIDATO",
+      "id": "WY3VajRFrao"
+    },
+    {
+      "nome": "AA",
+      "login": "234",
+      "senha": "234",
+      "perfil": "CANDIDATO",
+      "id": "AHEaijbI2pw"
+    }
+  ],
+  "eleicoes": [
+    {
+      "id": "1",
+      "cargo": "Presidente da República",
+      "data": "2026-11-20",
+      "turno": "1º Turno",
+      "horarioAbertura": "08:00",
+      "horarioEncerramento": "17:00",
+      "status": "ENCERRADA"
+    },
+    {
+      "id": "2",
+      "cargo": "Governador",
+      "data": "2026-11-20",
+      "turno": "1º Turno",
+      "horarioAbertura": "08:00",
+      "horarioEncerramento": "17:00",
+      "status": "ABERTA"
+    },
+    {
+      "cargo": "Deputado Federal",
+      "data": "2026-12-02",
+      "turno": "manhã",
+      "horarioAbertura": "10:00",
+      "horarioEncerramento": "00:14",
+      "status": "ABERTA",
+      "id": "ngpVLQ9hgZI"
+    },
+    {
+      "cargo": "Deputado Estadual",
+      "data": "2026-12-05",
+      "turno": "manhã",
+      "horarioAbertura": "03:20",
+      "horarioEncerramento": "22:25",
+      "status": "AGENDADA",
+      "id": "4EQkB4Y1KKQ"
+    }
+  ],
+  "candidatos": [
+    {
+      "id": "1",
+      "nome": "Candidato A",
+      "numero": 10,
+      "cargo": "Presidente da República",
+      "votos": 3
+    },
+    {
+      "id": "2",
+      "nome": "Candidato B",
+      "numero": 20,
+      "cargo": "Presidente da República",
+      "votos": 2
+    },
+    {
+      "nome": "A",
+      "numero": 12,
+      "cargo": "Governador",
+      "votos": 5,
+      "id": "2T5mjMxOi2o"
+    },
+    {
+      "nome": "AA",
+      "numero": 10,
+      "cargo": "Deputado Federal",
+      "partido": "VELHO",
+      "votos": 3,
+      "id": "HfVvxbrniIs"
+    }
+  ],
+  "votos": [
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "1",
+      "cargo": "Presidente da República",
+      "id": "03MIVNx8NWU"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "2",
+      "cargo": "Presidente da República",
+      "id": "RfCRn3mwago"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "2",
+      "cargo": "Presidente da República",
+      "id": "0u-pI8Kx4HM"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "1",
+      "cargo": "Presidente da República",
+      "id": "a3TKClMbugw"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "2",
+      "cargo": "Presidente da República",
+      "id": "4BQXMkxNXc4"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "1",
+      "cargo": "Presidente da República",
+      "id": "HkdGg2GPUOU"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "2",
+      "cargo": "Presidente da República",
+      "id": "HqGH0loFIiI"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "de877fQkh_o"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "qAje89WOJEw"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "1",
+      "cargo": "Presidente da República",
+      "id": "hLfh1yV4ofE"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "1",
+      "candidatoId": "1",
+      "cargo": "Presidente da República",
+      "id": "JHG6po3RIT8"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "wv3Wnbd0NSU"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "ngpVLQ9hgZI",
+      "candidatoId": "HfVvxbrniIs",
+      "cargo": "Deputado Federal",
+      "id": "tw6XWjl1E-8"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "ngpVLQ9hgZI",
+      "candidatoId": "HfVvxbrniIs",
+      "cargo": "Deputado Federal",
+      "id": "tzoBuUF7t78"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "Zi6Pa7dAKDU"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "ngpVLQ9hgZI",
+      "candidatoId": "HfVvxbrniIs",
+      "cargo": "Deputado Federal",
+      "id": "QirtA4QJeMs"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "_g0J3tPkpqM"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "q6x3McMsEvI"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "2",
+      "candidatoId": "2T5mjMxOi2o",
+      "cargo": "Governador",
+      "id": "B6MAjEVagYc"
+    },
+    {
+      "eleitorId": "2",
+      "eleicaoId": "ngpVLQ9hgZI",
+      "candidatoId": "HfVvxbrniIs",
+      "cargo": "Deputado Federal",
+      "id": "cj24UFgHiUA"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

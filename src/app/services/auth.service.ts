@@ -53,4 +53,21 @@ export class AuthService {
   get usuarioLogado() {
     return this.usuarioAtual.asObservable();
   }
+   //para cadastrar usuario no chefe-tabs
+    cadastrarUsuario(usuario: any) {
+    return this.http.post(`${this.apiUrl}/usuarios`, usuario);
+  }
+   get usuarioLogadoValue() {
+    return this.usuarioAtual.value;
+  }
+    listarUsuarios(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios`);
+  }
+
+  excluirUsuario(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/usuarios/${id}`);
+  }
+    atualizarUsuario(id: string, usuario: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/usuarios/${id}`, usuario);
+  }
 }

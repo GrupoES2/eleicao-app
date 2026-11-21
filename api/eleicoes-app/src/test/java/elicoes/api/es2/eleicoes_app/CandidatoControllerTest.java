@@ -6,12 +6,12 @@ import elicoes.api.es2.eleicoes_app.domain.Enum.CargoUsuario;
 import elicoes.api.es2.eleicoes_app.domain.Enum.StatusEleicao;
 import elicoes.api.es2.eleicoes_app.domain.Enum.TipoCandidato;
 import elicoes.api.es2.eleicoes_app.domain.Usuario;
-import elicoes.api.es2.eleicoes_app.domain.Voto;
 import elicoes.api.es2.eleicoes_app.dto.CandidatoRequest;
+import elicoes.api.es2.eleicoes_app.integracao.EventoIntegracaoRepository;
+import elicoes.api.es2.eleicoes_app.integracao.TipoEventoIntegracao;
 import elicoes.api.es2.eleicoes_app.repository.CandidatoRepository;
 import elicoes.api.es2.eleicoes_app.repository.EleicaoRepository;
 import elicoes.api.es2.eleicoes_app.repository.UsuarioRepository;
-import elicoes.api.es2.eleicoes_app.repository.VotoRepository;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class CandidatoControllerTest {
 
     private static final String CPF_CHEFE = "39053344705";
@@ -66,13 +68,13 @@ class CandidatoControllerTest {
     private CandidatoRepository candidatoRepository;
 
     @Autowired
-    private VotoRepository votoRepository;
+    private EventoIntegracaoRepository eventoIntegracaoRepository;
 
     private Long eleicaoId;
 
     @BeforeEach
     void preparar() {
-        votoRepository.deleteAll();
+        eventoIntegracaoRepository.deleteAll();
         candidatoRepository.deleteAll();
         usuarioRepository.deleteAll();
         eleicaoRepository.deleteAll();
@@ -105,7 +107,7 @@ class CandidatoControllerTest {
     }
 
     @Test
-    void cadastraConsultaAlteraEExcluiSemExporSenha() throws Exception {
+    void cadastraConsultaEAlteraSemExporSenha() throws Exception {
         String corpo = mockMvc.perform(post("/candidatos")
                         .with(httpBasic(CPF_CHEFE, SENHA_CHEFE))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,12 +147,8 @@ class CandidatoControllerTest {
                 .andExpect(jsonPath("$.senha").doesNotExist());
 
         assertThat(usuarioRepository.findByCpf(CPF_CANDIDATO).orElseThrow().getSenha()).isEqualTo(hashAnterior);
-
-        mockMvc.perform(delete("/candidatos/{id}", id).with(httpBasic(CPF_CHEFE, SENHA_CHEFE)))
-                .andExpect(status().isNoContent());
-
-        assertThat(candidatoRepository.findById(id)).isEmpty();
-        assertThat(usuarioRepository.findByCpf(CPF_CANDIDATO)).isEmpty();
+        assertThat(eventoIntegracaoRepository.findAll())
+                .anyMatch(evento -> evento.getTipo() == TipoEventoIntegracao.CANDIDATO_ATUALIZADO);
     }
 
     @Test
@@ -231,7 +229,7 @@ class CandidatoControllerTest {
     }
 
     @Test
-    void preservaCandidatoComVotoRegistrado() throws Exception {
+    void recusaExcluirSemConfirmacaoDaVotacao() throws Exception {
         mockMvc.perform(post("/candidatos")
                         .with(httpBasic(CPF_CHEFE, SENHA_CHEFE))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -239,15 +237,14 @@ class CandidatoControllerTest {
                 .andExpect(status().isCreated());
 
         Candidato candidato = candidatoRepository.findAll().getFirst();
-        Voto voto = new Voto();
-        voto.setCandidato(candidato);
-        voto.setEleicao(eleicaoRepository.findById(eleicaoId).orElseThrow());
-        votoRepository.save(voto);
 
         mockMvc.perform(delete("/candidatos/{id}", candidato.getId()).with(httpBasic(CPF_CHEFE, SENHA_CHEFE)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensagem").value("Não foi possível confirmar os votos do candidato"));
 
         assertThat(candidatoRepository.findById(candidato.getId())).isPresent();
+        assertThat(eventoIntegracaoRepository.findAll())
+                .noneMatch(evento -> evento.getTipo() == TipoEventoIntegracao.CANDIDATO_REMOVIDO);
     }
 
     @Test

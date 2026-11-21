@@ -11,10 +11,10 @@ import elicoes.api.es2.eleicoes_app.dto.CandidatoResponse;
 import elicoes.api.es2.eleicoes_app.exception.ConflitoDeDadosException;
 import elicoes.api.es2.eleicoes_app.exception.RecursoNaoEncontradoException;
 import elicoes.api.es2.eleicoes_app.exception.RequisicaoInvalidaException;
-import elicoes.api.es2.eleicoes_app.integracao.IntegracaoVotacao;
 import elicoes.api.es2.eleicoes_app.repository.CandidatoRepository;
 import elicoes.api.es2.eleicoes_app.repository.EleicaoRepository;
 import elicoes.api.es2.eleicoes_app.repository.UsuarioRepository;
+import elicoes.api.es2.eleicoes_app.repository.VotoRepository;
 import elicoes.api.es2.eleicoes_app.validation.RegrasNumeroCandidato;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,19 +41,19 @@ public class CandidatoService {
     private final CandidatoRepository candidatoRepository;
     private final UsuarioRepository usuarioRepository;
     private final EleicaoRepository eleicaoRepository;
+    private final VotoRepository votoRepository;
     private final PasswordEncoder passwordEncoder;
-    private final IntegracaoVotacao integracaoVotacao;
 
     public CandidatoService(CandidatoRepository candidatoRepository,
                             UsuarioRepository usuarioRepository,
                             EleicaoRepository eleicaoRepository,
-                            PasswordEncoder passwordEncoder,
-                            IntegracaoVotacao integracaoVotacao) {
+                            VotoRepository votoRepository,
+                            PasswordEncoder passwordEncoder) {
         this.candidatoRepository = candidatoRepository;
         this.usuarioRepository = usuarioRepository;
         this.eleicaoRepository = eleicaoRepository;
+        this.votoRepository = votoRepository;
         this.passwordEncoder = passwordEncoder;
-        this.integracaoVotacao = integracaoVotacao;
     }
 
     @PreAuthorize("hasRole('CHEFE_SECAO')")
@@ -79,7 +79,6 @@ public class CandidatoService {
         candidato.setPartido(request.partido());
         candidato.setTipo(request.tipo());
         candidato = candidatoRepository.save(candidato);
-        integracaoVotacao.enfileirarCandidato(candidato);
 
         log.info("Candidato cadastrado id={} eleicaoId={}", candidato.getId(), eleicao.getId());
         return toResponse(candidato);
@@ -109,7 +108,6 @@ public class CandidatoService {
         candidato.setNumero(request.numero());
         candidato.setPartido(request.partido());
         candidato.setTipo(request.tipo());
-        integracaoVotacao.enfileirarCandidato(candidato);
 
         log.info("Candidato alterado id={} eleicaoId={}", candidato.getId(), eleicao.getId());
         return toResponse(candidato);
@@ -130,7 +128,7 @@ public class CandidatoService {
     @PreAuthorize("hasRole('CHEFE_SECAO')")
     public void excluir(Long id) {
         Candidato candidato = buscar(id);
-        if (integracaoVotacao.possuiVotos(id)) {
+        if (votoRepository.existsByCandidatoId(id)) {
             throw new ConflitoDeDadosException("Candidato com votos registrados não pode ser excluído");
         }
         Long usuarioId = candidato.getUsuario().getId();
@@ -139,7 +137,6 @@ public class CandidatoService {
         if (!candidatoRepository.existsByUsuarioId(usuarioId)) {
             usuarioRepository.deleteById(usuarioId);
         }
-        integracaoVotacao.enfileirarRemocao(id);
         log.info("Candidato excluído id={}", id);
     }
 

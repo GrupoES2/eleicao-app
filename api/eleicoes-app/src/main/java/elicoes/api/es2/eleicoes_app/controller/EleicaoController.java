@@ -1,7 +1,5 @@
 package elicoes.api.es2.eleicoes_app.controller;
 
-import elicoes.api.es2.eleicoes_app.domain.Enum.TipoCandidato;
-import elicoes.api.es2.eleicoes_app.dto.CandidatoResumoResponse;
 import elicoes.api.es2.eleicoes_app.dto.EleicaoRequest;
 import elicoes.api.es2.eleicoes_app.dto.EleicaoResponse;
 
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -43,12 +40,6 @@ public class EleicaoController {
 
     @PostMapping("/{id}/encerramento")
     public EleicaoResponse encerrar(@PathVariable Long id) {
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @GetMapping("/{id}/candidatos")
-    public List<CandidatoResumoResponse> listarCandidatos(@PathVariable Long id,
-                                                          @RequestParam(required = false) TipoCandidato tipo) {
         throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
     }
 

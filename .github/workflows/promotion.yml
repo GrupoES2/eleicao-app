@@ -1,0 +1,187 @@
+name: Promotion
+
+# O environment escolhe o app e a conta AWS. A direcao da branch esta neste arquivo.
+#   homologacao: app promotion-to-hmg, leva a release que esta em desenvolvimento para a branch homologacao.
+#   producao:    app promotion-to-prod, leva a release que esta em homologacao para a branch producao.
+
+on:
+  workflow_dispatch:
+    inputs:
+      versao:
+        description: Numero da release, sem o v. Exemplo 0.1.0
+        required: true
+        type: string
+      ambiente:
+        description: homologacao leva desenvolvimento para homologacao. producao leva homologacao para producao.
+        required: true
+        type: choice
+        options:
+          - homologacao
+          - producao
+
+jobs:
+  promotion:
+    name: promotion
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ambiente }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    concurrency:
+      group: promotion-${{ inputs.ambiente }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Define de qual branch para qual branch
+        env:
+          AMBIENTE: ${{ inputs.ambiente }}
+        run: |
+          case "$AMBIENTE" in
+            homologacao)
+              echo "ORIGEM=desenvolvimento" >> "$GITHUB_ENV"
+              echo "DESTINO=homologacao" >> "$GITHUB_ENV"
+              echo "Promotion de desenvolvimento para homologacao, com o app promotion-to-hmg."
+              ;;
+            producao)
+              echo "ORIGEM=homologacao" >> "$GITHUB_ENV"
+              echo "DESTINO=producao" >> "$GITHUB_ENV"
+              echo "Promotion de homologacao para producao, com o app promotion-to-prod."
+              ;;
+            *)
+              echo "Ambiente desconhecido: ${AMBIENTE}"
+              exit 1
+              ;;
+          esac
+
+      - name: Token do GitHub App
+        id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+
+      - name: Confere quem disparou
+        env:
+          ATOR: ${{ github.actor }}
+          AMBIENTE: ${{ inputs.ambiente }}
+        run: |
+          case "$AMBIENTE" in
+            homologacao)
+              permitidos=(
+                Leti24-mar
+                rafaeltavaares
+              )
+              ;;
+            producao)
+              permitidos=(
+                Leti24-mar
+                rafaeltavaares
+              )
+              ;;
+          esac
+          for login in "${permitidos[@]}"; do
+            if [[ "$ATOR" == "$login" ]]; then
+              echo "${ATOR} pode disparar a promotion para ${AMBIENTE}."
+              exit 0
+            fi
+          done
+          echo "${ATOR} nao esta na lista de ${AMBIENTE}."
+          exit 1
+
+      - name: Confere a release na branch de origem
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSAO: ${{ inputs.versao }}
+        run: |
+          if [[ ! "$VERSAO" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "A versao precisa ser X.Y.Z, sem o v."
+            exit 1
+          fi
+          git fetch origin "$ORIGEM"
+          git fetch origin "refs/tags/v${VERSAO}:refs/tags/v${VERSAO}"
+          sha="$(git rev-parse "v${VERSAO}^{commit}")"
+          if [[ "$DESTINO" == "producao" ]]; then
+            atual="$(git rev-parse "origin/${ORIGEM}")"
+            if [[ "$atual" != "$sha" ]]; then
+              echo "producao so recebe a release que ja esta na ponta de ${ORIGEM}."
+              exit 1
+            fi
+          elif ! git merge-base --is-ancestor "$sha" "origin/${ORIGEM}"; then
+            echo "A release v${VERSAO} nao esta em ${ORIGEM}."
+            exit 1
+          fi
+          mkdir -p dist
+          gh release download "v${VERSAO}" --dir dist
+          cd dist
+          sha256sum -c SHA256SUMS
+          cd ..
+          echo "SHA=${sha}" >> "$GITHUB_ENV"
+
+      - name: Avanca a branch de destino
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Avancando ${DESTINO} para a release que estava em ${ORIGEM}."
+          if gh api "repos/${REPO}/git/ref/heads/${DESTINO}" >/dev/null 2>&1; then
+            gh api --method PATCH "repos/${REPO}/git/refs/heads/${DESTINO}" \
+              -f sha="$SHA" \
+              -F force=false
+          else
+            gh api --method POST "repos/${REPO}/git/refs" \
+              -f ref="refs/heads/${DESTINO}" \
+              -f sha="$SHA"
+          fi
+
+      - name: Attestation do deploy
+        env:
+          VERSAO: ${{ inputs.versao }}
+          AMBIENTE: ${{ inputs.ambiente }}
+        run: |
+          jq -Rn \
+            --arg ambiente "$AMBIENTE" \
+            --arg version "$VERSAO" \
+            --arg sha "$SHA" \
+            --arg release "v${VERSAO}" \
+            'reduce inputs as $line ({ambiente: $ambiente, version: $version, sha: $sha, release: $release, digests: {}};
+              ($line | capture("(?<digest>[0-9a-f]+)  (?<nome>.+)")) as $p
+              | .digests[$p.nome] = ("sha256:" + $p.digest))' \
+            < dist/SHA256SUMS > deploy-predicate.json
+
+      - uses: actions/attest@v2
+        with:
+          subject-path: |
+            dist/eleicoes-app-${{ inputs.versao }}.jar
+            dist/votacao-${{ inputs.versao }}.jar
+            dist/mobile-${{ inputs.versao }}.zip
+          predicate-type: https://github.com/${{ github.repository }}/attestations/deploy/v1
+          predicate-path: deploy-predicate.json
+
+      - name: Assume o papel da conta
+        if: vars.AWS_ROLE != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Publica os bytes aceitos na conta
+        if: vars.AWS_ROLE != ''
+        env:
+          BUCKET: ${{ vars.AWS_ARTIFACT_BUCKET }}
+          AMBIENTE: ${{ inputs.ambiente }}
+          VERSAO: ${{ inputs.versao }}
+        run: |
+          if [[ -z "$BUCKET" ]]; then
+            echo "Papel da conta ${AMBIENTE} assumido. Defina AWS_ARTIFACT_BUCKET para enviar os arquivos."
+            aws sts get-caller-identity
+            exit 0
+          fi
+          aws s3 sync dist "s3://${BUCKET}/v${VERSAO}/" --only-show-errors

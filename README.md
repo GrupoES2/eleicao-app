@@ -57,6 +57,6 @@ O sistema foi dividido em duas camadas principais:
 **No Back-End (Spring Boot):**
 - **.
 
-## 🗄️ Modelagem do Banco de Dados
+## Modelagem do Banco de Dados
 O sistema é composto pelas seguintes entidades principais:
 - **

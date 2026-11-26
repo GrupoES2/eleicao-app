@@ -1,0 +1,725 @@
+openapi: 3.1.0
+info:
+  title: Eleição App API
+  version: 1.0.0
+  description: |
+    Documentação consolidada dos endpoints declarados nos arquivos enviados
+    do Eleição App. A documentação considera as rotas encontradas nas versões
+    desenvolvimento, homologação e branches de funcionalidades.
+
+    ATENÇÃO: vários métodos dos controllers lançam HTTP 501 Not Implemented.
+    Esses endpoints estão documentados como rotas previstas, não como
+    funcionalidades confirmadas em execução. Consulte a descrição de cada operação.
+tags:
+  - name: Autenticação
+  - name: Candidatos
+  - name: Eleitores
+  - name: Eleições
+  - name: Votação
+  - name: Apuração
+  - name: Resultados
+paths:
+  /auth/login:
+    post:
+      tags: [Autenticação]
+      summary: Realizar login
+      description: Na versão de homologação, o método está declarado, mas retorna 501. Na versão desenvolvimento, chama o serviço de autenticação.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login realizado (versão desenvolvimento).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '501':
+          description: Endpoint não implementado na versão de homologação.
+  /candidatos:
+    post:
+      tags: [Candidatos]
+      summary: Cadastrar candidato
+      operationId: cadastrarCandidato
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidatoRequest'
+      responses:
+        '201':
+          description: Candidato cadastrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidatoResponse'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+    get:
+      tags: [Candidatos]
+      summary: Listar candidatos
+      operationId: listarCandidatos
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        '200':
+          description: Página de candidatos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaCandidato'
+  /candidatos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [Candidatos]
+      summary: Consultar candidato por ID
+      operationId: consultarCandidato
+      responses:
+        '200':
+          description: Candidato encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidatoResponse'
+        '404':
+          description: Candidato não encontrado.
+    put:
+      tags: [Candidatos]
+      summary: Atualizar candidato
+      operationId: alterarCandidato
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidatoAtualizacaoRequest'
+      responses:
+        '200':
+          description: Candidato atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidatoResponse'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+    delete:
+      tags: [Candidatos]
+      summary: Excluir candidato
+      operationId: excluirCandidato
+      responses:
+        '204':
+          description: Candidato excluído.
+  /eleitores:
+    post:
+      tags: [Eleitores]
+      summary: Cadastrar eleitor
+      operationId: cadastrarEleitor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EleitorRequest'
+      responses:
+        '200':
+          description: Eleitor cadastrado (status implícito do controller).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleitorResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+    get:
+      tags: [Eleitores]
+      summary: Listar eleitores
+      operationId: listarEleitores
+      responses:
+        '200':
+          description: Lista de eleitores.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EleitorResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleitores/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [Eleitores]
+      summary: Consultar eleitor por ID
+      operationId: consultarEleitor
+      responses:
+        '200':
+          description: Eleitor encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleitorResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+    put:
+      tags: [Eleitores]
+      summary: Atualizar eleitor
+      operationId: alterarEleitor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EleitorRequest'
+      responses:
+        '200':
+          description: Eleitor atualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleitorResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+    delete:
+      tags: [Eleitores]
+      summary: Excluir eleitor
+      operationId: excluirEleitor
+      responses:
+        '204':
+          description: Exclusão sem conteúdo (status declarado no controller).
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes:
+    post:
+      tags: [Eleições]
+      summary: Cadastrar eleição
+      operationId: cadastrarEleicao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EleicaoRequest'
+      responses:
+        '200':
+          description: Eleição cadastrada (status implícito do controller).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleicaoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+    get:
+      tags: [Eleições]
+      summary: Listar eleições
+      operationId: listarEleicoes
+      responses:
+        '200':
+          description: Lista de eleições.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EleicaoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      tags: [Eleições]
+      summary: Consultar eleição
+      operationId: consultarEleicao
+      responses:
+        '200':
+          description: Eleição encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleicaoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{id}/abertura:
+    post:
+      tags: [Eleições]
+      summary: Abrir eleição
+      operationId: abrirEleicao
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Eleição aberta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleicaoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{id}/encerramento:
+    post:
+      tags: [Eleições]
+      summary: Encerrar eleição
+      operationId: encerrarEleicao
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Eleição encerrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleicaoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{id}/candidatos:
+    get:
+      tags: [Eleições]
+      summary: Listar candidatos de uma eleição
+      operationId: listarCandidatosDaEleicao
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: tipo
+          in: query
+          required: false
+          description: Tipo de candidato, conforme enum TipoCandidato.
+          schema:
+            $ref: '#/components/schemas/TipoCandidato'
+      responses:
+        '200':
+          description: Candidatos da eleição.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidatoResumoResponse'
+        '501':
+          description: Rota encontrada na versão de homologação; método não implementado.
+  /eleicoes/{eleicaoId}/votos:
+    post:
+      tags: [Votação]
+      summary: Registrar voto
+      operationId: registrarVoto
+      parameters:
+        - $ref: '#/components/parameters/eleicaoId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VotoRequest'
+      responses:
+        '200':
+          description: Voto registrado (status implícito do controller).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{eleicaoId}/votos/confirmacao:
+    post:
+      tags: [Votação]
+      summary: Confirmar voto
+      operationId: confirmarVoto
+      parameters:
+        - $ref: '#/components/parameters/eleicaoId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VotoRequest'
+      responses:
+        '200':
+          description: Voto confirmado (status implícito do controller).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VotoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{eleicaoId}/apuracao:
+    get:
+      tags: [Apuração]
+      summary: Consultar apuração
+      operationId: consultarApuracao
+      parameters:
+        - $ref: '#/components/parameters/eleicaoId'
+        - name: tipo
+          in: query
+          required: false
+          description: Filtra por tipo de candidato.
+          schema:
+            $ref: '#/components/schemas/TipoCandidato'
+      responses:
+        '200':
+          description: Apuração por candidato.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoCandidatoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+  /eleicoes/{eleicaoId}/resultado:
+    get:
+      tags: [Resultados]
+      summary: Consultar resultado da eleição
+      operationId: consultarResultado
+      parameters:
+        - $ref: '#/components/parameters/eleicaoId'
+      responses:
+        '200':
+          description: Resultado agrupado por cargo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResultadoCargoResponse'
+        '501':
+          description: Método declarado, mas não implementado.
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    eleicaoId:
+      name: eleicaoId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    page:
+      name: page
+      in: query
+      required: false
+      description: Índice da página, começando em zero.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    size:
+      name: size
+      in: query
+      required: false
+      description: Quantidade de itens por página (padrão 20; máximo 50 configurado).
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+    sort:
+      name: sort
+      in: query
+      required: false
+      description: Campo de ordenação, no formato campo,direção.
+      schema:
+        type: array
+        items:
+          type: string
+        default: [id,asc]
+      style: form
+      explode: true
+  responses:
+    ErroValidacao:
+      description: Dados inválidos.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroResponse'
+  schemas:
+    LoginRequest:
+      type: object
+      required: [cpf, senha]
+      properties:
+        cpf:
+          type: string
+          description: CPF; o código normaliza para dígitos.
+        senha:
+          type: string
+          format: password
+    LoginResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        cargo:
+          $ref: '#/components/schemas/CargoUsuario'
+        token:
+          type: string
+    CandidatoRequest:
+      type: object
+      required: [nome, sobrenome, nomeDaMae, cpf, telefone, email, senha, eleicaoId, numero, partido, tipo]
+      properties:
+        nome:
+          type: string
+          minLength: 2
+          maxLength: 80
+        sobrenome:
+          type: string
+          minLength: 2
+          maxLength: 80
+        nomeDaMae:
+          type: string
+          minLength: 2
+          maxLength: 80
+        cpf:
+          type: string
+          description: CPF válido.
+        telefone:
+          type: string
+          pattern: '^\d{10,11}$'
+        email:
+          type: string
+          format: email
+          maxLength: 120
+        senha:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+        eleicaoId:
+          type: integer
+          format: int64
+          minimum: 1
+        numero:
+          type: string
+          pattern: '^\d{2,5}$'
+        partido:
+          type: string
+          minLength: 2
+          maxLength: 80
+        tipo:
+          $ref: '#/components/schemas/TipoCandidato'
+    CandidatoAtualizacaoRequest:
+      allOf:
+        - $ref: '#/components/schemas/CandidatoRequest'
+      description: Atualização de candidato; senha pode ser omitida ou enviada vazia conforme validação do DTO.
+    CandidatoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        usuarioId:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        sobrenome:
+          type: string
+        nomeDaMae:
+          type: string
+        cpf:
+          type: string
+        telefone:
+          type: string
+        email:
+          type: string
+        eleicaoId:
+          type: integer
+          format: int64
+        numero:
+          type: string
+        partido:
+          type: string
+        tipo:
+          $ref: '#/components/schemas/TipoCandidato'
+    CandidatoResumoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        numero:
+          type: string
+        partido:
+          type: string
+        tipo:
+          $ref: '#/components/schemas/TipoCandidato'
+    EleitorRequest:
+      type: object
+      properties:
+        nome:
+          type: string
+        sobrenome:
+          type: string
+        nomeDaMae:
+          type: string
+        cpf:
+          type: string
+        telefone:
+          type: string
+        email:
+          type: string
+        senha:
+          type: string
+          format: password
+    EleitorResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        sobrenome:
+          type: string
+        nomeDaMae:
+          type: string
+        cpf:
+          type: string
+        telefone:
+          type: string
+        email:
+          type: string
+        cargo:
+          $ref: '#/components/schemas/CargoUsuario'
+    EleicaoRequest:
+      type: object
+      properties:
+        data:
+          type: string
+          format: date
+        turno:
+          type: integer
+        horarioAbertura:
+          type: string
+          format: time
+        horarioEncerramento:
+          type: string
+          format: time
+    EleicaoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        data:
+          type: string
+          format: date
+        turno:
+          type: integer
+        horarioAbertura:
+          type: string
+          format: time
+        horarioEncerramento:
+          type: string
+          format: time
+        status:
+          $ref: '#/components/schemas/StatusEleicao'
+    VotoRequest:
+      type: object
+      required: [candidatoId]
+      properties:
+        candidatoId:
+          type: integer
+          format: int64
+          minimum: 1
+    VotoResponse:
+      type: object
+      properties:
+        eleicaoId:
+          type: integer
+          format: int64
+        candidatoId:
+          type: integer
+          format: int64
+        tipo:
+          $ref: '#/components/schemas/TipoCandidato'
+        confirmado:
+          type: boolean
+    ApuracaoCandidatoResponse:
+      type: object
+      properties:
+        candidatoId:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        numero:
+          type: string
+        partido:
+          type: string
+        tipo:
+          $ref: '#/components/schemas/TipoCandidato'
+        quantidadeVotos:
+          type: integer
+          format: int64
+    ResultadoCargoResponse:
+      type: object
+      properties:
+        tipo:
+          $ref: '#/components/schemas/TipoCandidato'
+        candidatoMaisVotadoId:
+          type: integer
+          format: int64
+        candidatos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApuracaoCandidatoResponse'
+    ErroResponse:
+      type: object
+      properties:
+        mensagem:
+          type: string
+        erros:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampoErro'
+    CampoErro:
+      type: object
+      properties:
+        campo:
+          type: string
+        mensagem:
+          type: string
+    PaginaCandidato:
+      type: object
+      description: Estrutura de página do Spring Data. Os campos exatos podem variar conforme a configuração de serialização.
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidatoResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+    TipoCandidato:
+      type: string
+      description: Valores do enum definido no projeto; conferir a enumeração no código.
+    CargoUsuario:
+      type: string
+      description: Valores do enum CargoUsuario definido no projeto.
+    StatusEleicao:
+      type: string
+      description: Valores do enum StatusEleicao definido no projeto.
